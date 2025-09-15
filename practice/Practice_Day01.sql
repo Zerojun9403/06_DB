@@ -38,7 +38,9 @@ SELECT now() as `현재시간`,
 -- 문제 6
 -- STUDENT 테이블에서 학번과 이름을 연결하여 하나의 컬럼으로 조회하시오.
 -- (컬럼명은 '학번_이름'으로 별칭 지정)
-
+SELECT 
+    CONCAT(STUDENT_NO, '_', STUDENT_NAME) AS '학번_이름'
+FROM STUDENT;
 
 -- 문제 7
 -- STUDENT 테이블에서 존재하는 학과번호의 종류만 중복 없이 조회하시오.
