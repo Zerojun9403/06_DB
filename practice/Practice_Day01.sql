@@ -54,7 +54,7 @@ FROM GRADE;
 -- 학번, 이름, 학과번호를 조회하시오.
 SELECT STUDENT_NO, STUDENT_NAME, department_NO, ABSENCE_YN
 FROM STUDENT
-WHERE ABSENCE_YN = 'Y';
+WHERE ABSENCE_YN = Y;
 
 -- 문제 10
 -- DEPARTMENT 테이블에서 정원(CAPACITY)이 25명 이상인 학과의 
@@ -68,7 +68,7 @@ WHERE CAPACITY >= 25;
 -- 이름, 학과번호, 주소를 조회하시오.
 SELECT  student_NAME, DEPARTMENT_NO, STUDENT_ADDRESS
 FROM STUDENT
-WHERE DEPARTMENT_NO != '001';
+WHERE DEPARTMENT_NO != 001;
 
 -- 문제 12
 -- GRADE 테이블에서 성적(POINT)이 4.0 이상인 성적 데이터의 
@@ -90,7 +90,7 @@ LIKE '2005%';
 -- 교수번호, 이름, 학과번호를 조회하시오.
 SELECT  PROFESSOR_NO, PROFESSOR_NAME,  DEPARTMENT_NO
 FROM PROFESSOR
-WHERE DEPARTMENT_NO IS NOT NULL;
+WHERE DEPARTMENT_NO != NULL;
 
 -- 문제 15
 -- CLASS 테이블에서 과목유형(CLASS_TYPE)이 '전공필수'인 과목의 
@@ -110,10 +110,10 @@ WHERE STUDENT_ADDRESS LIKE '서울시%';
 -- 문제 17
 -- GRADE 테이블에서 성적이 3.0 이상 4.0 미만인 성적 데이터의 
 -- 학번, 과목번호, 성적을 조회하시오.
-select student_no, class_no, point
-from GRADE
-where point >= 3.0
-and    point < 4.0;
+SELECT student_no, class_no, point
+FROM GRADE
+WHERE point >= 3.0
+OR    point < 4.0;
 
 -- 문제 18
 -- STUDENT 테이블에서 지도교수번호(COACH_PROFESSOR_NO)가 'P001'인 학생의 
