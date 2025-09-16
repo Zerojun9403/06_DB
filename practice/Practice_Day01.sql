@@ -30,7 +30,7 @@ FROM STUDENT;
 
 SELECT NOW() 현재시간, NOW() - interval 1 DAY AS "어제", NOW() + interval 1 DAY AS "내일";
 
-
+USE chun_university;
 -- 문제 6
 -- STUDENT 테이블에서 학번과 이름을 연결하여 하나의 컬럼으로 조회하시오.
 -- (컬럼명은 '학번_이름'으로 별칭 지정)
