@@ -111,116 +111,187 @@ id,stord_id,name,description,price,is_popular
 
 
 -- 문제1: 가장 싼 메뉴 찾기
-SELECT min(price)
-FROM menus;
-
 -- 1단계: 최저 가격 찾기
-SELECT price, name
+SELECT min(price) FROM menus;
+-- 2단계: 그 가격인 메뉴 찾기 (메뉴명, 가격)
+SELECT name, price
 FROM menus
 WHERE price = 1500;
-
--- 2단계: 그 가격인 메뉴 찾기 (메뉴명, 가격)
 -- 조합 : 1단계 2단계를 조합하여 한 번에 조회하기
-SELECT price, name
+SELECT name, price
 FROM menus
-WHERE price =(SELECT min(price) FROM menus);
+WHERE price = (SELECT min(price) FROM menus);
 
 -- 문제2: 평점이 가장 낮은 매장 찾기 (NULL 제외)
 -- 1단계: 최저 평점 찾기
-SELECT min(rating)
-FROM stores;
+SELECT  min(rating) FROM stores;
+/*
+stores = id, name, category, address, phone, rating, delivery_fee
+menus  = id, store_id, name, description, price, is_popular
+*/
 -- 2단계: 그 평점인 매장 찾기 (매장명, 평점, 카테고리)
-SELECT name,rating,category
+SELECT name, rating, category
 FROM stores
 WHERE rating = 4.2;
 -- 조합 : 1단계 2단계를 조합하여 한 번에 조회하기
-SELECT name,rating,category
+SELECT name, rating, category
 FROM stores
 WHERE rating = (SELECT min(rating) FROM stores);
 
 -- 문제3: 배달비가 가장 저렴한 매장 찾기 (NULL 제외)
 -- 1단계: 최저 배달비 찾기
-SELECT MIN(delivery_fee) AS 최저배달비
-FROM stores
-WHERE delivery_fee IS NOT NULL;
+SELECT min(delivery_fee) FROM stores WHERE delivery_fee IS NOT NULL;
 -- 2단계: 그 배달비인 매장들 찾기 (매장명, 배달비, 주소)
-SELECT name,delivery_fee, address
+SELECT name, delivery_fee, address
 FROM stores
 WHERE delivery_fee = 2000;
 -- 조합 : 1단계 2단계를 조합하여 한 번에 조회하기
-SELECT name,delivery_fee, address
+SELECT name, delivery_fee, address
 FROM stores
-WHERE delivery_fee = (SELECT min(delivery_fee) FROM stores);
+WHERE delivery_fee = (SELECT min(delivery_fee) FROM stores WHERE delivery_fee IS NOT NULL);
 
 -- 문제4: 평균 평점보다 높은 매장들 찾기
 -- 1단계: 전체 매장 평균 평점 구하기
-SELECT AVG(rating) 
-FROM stores;
+SELECT avg(rating) FROM stores;
 -- 2단계: 평균보다 높은 평점의 매장들 찾기 (매장명, 평점, 카테고리)
-SELECT name, rating, category
+SELECT name, rating, category 
 FROM stores
-WHERE rating >4.66454;
+WHERE rating >4.66545;
 -- 조합 : 1단계 2단계를 조합하여 한 번에 조회하기
-SELECT name, rating, category
+SELECT name, rating, category 
 FROM stores
-WHERE rating > (SELECT AVG(rating) FROM stores);
+WHERE rating >(SELECT avg(rating) FROM stores);
 
 -- 문제5: 평균 배달비보다 저렴한 매장들 찾기 (NULL 제외)
 -- 1단계: 전체 매장 평균 배달비 구하기
-SELECT AVG(delivery_fee) AS 평균배달비
+SELECT avg(delivery_fee)
 FROM stores
 WHERE delivery_fee IS NOT NULL;
 -- 2단계: 평균보다 저렴한 배달비의 매장들 찾기 (매장명, 배달비, 카테고리)
 SELECT name, delivery_fee, category
 FROM stores
-WHERE delivery_fee <3179.24543;
+WHERE delivery_fee < 3179.2453;
 -- 조합 : 1단계 2단계를 조합하여 한 번에 조회하기
 SELECT name, delivery_fee, category
 FROM stores
-WHERE delivery_fee  < (SELECT AVG(delivery_fee) FROM stores);
+WHERE delivery_fee < (SELECT avg(delivery_fee) FROM stores);
 
 -- 문제6: 치킨집 중에서 평점이 가장 높은 곳
 -- 1단계: 치킨집들의 최고 평점 찾기
-SELECT MAX(rating)
-FROM stores
-WHERE category ='치킨';
+SELECT max(rating) FROM stores WHERE category = '치킨';
 -- 2단계: 치킨집 중 그 평점인 매장 찾기 (매장명, 평점, 주소)
-SELECT name, rating, address
-FROM stores
-WHERE category ='치킨'
-and rating = (SELECT MAX(rating) FROM stores WHERE category ='치킨');
-
-
+select name, rating, address
+from stores
+where category = '치킨' and rating = 4.9;
 -- 조합 : 1단계 2단계를 조합하여 한 번에 조회하기
+select name, rating, address
+from stores
+where category = '치킨'
+and rating = (SELECT max(rating) FROM stores WHERE category = '치킨');
+
 
 -- 문제7: 치킨집 중에서 배달비가 가장 저렴한 곳 (NULL 제외)
 -- 1단계: 치킨집들의 최저 배달비 찾기
-select min(deliver_fee)
-FROM stores;
+select min(delivery_fee)
+from stores
+where category = '치킨';
 -- 2단계: 치킨집 중 그 배달비인 매장 찾기 (매장명, 배달비)
+select name, delivery_fee
+from stores
+where category = '치킨' and delivery_fee = 2000;
 -- 조합 : 1단계 2단계를 조합하여 한 번에 조회하기
+select name, delivery_fee
+from stores
+where category = '치킨' and delivery_fee = (select min(delivery_fee) from stores where category = '치킨');
 
 -- 문제8: 중식집 중에서 평점이 가장 높은 곳
 -- 1단계: 중식집들의 최고 평점 찾기
+select max(rating)
+from stores
+where category = '중식';
 -- 2단계: 중식집 중 그 평점인 매장 찾기 (매장명, 평점, 주소)
+select name, rating,address
+from stores
+where rating = 4.7 and category = '중식';
 -- 조합 : 1단계 2단계를 조합하여 한 번에 조회하기
+select name, rating,address
+from stores
+where rating = (select max(rating) from stores where category = '중식') 
+and category = '중식';
 
 -- 문제9: 피자집들의 평균 평점보다 높은 치킨집들
 -- 1단계: 피자집들의 평균 평점 구하기
 select avg(rating)
 from stores
-where  category = '피자';
+where category = '피자';
 -- 2단계: 그보다 높은 평점의 치킨집들 찾기 (매장명, 평점)
-select name, raing
+select name, rating
 from stores
-where category='치킨'
-and rating > 4.7;
+where category = '치킨'
+and  rating > 4.7;
 -- 조합 : 1단계 2단계를 조합하여 한 번에 조회하기
+select name, rating
+from stores
+where category = '치킨'
+and  rating > (select avg(rating) from stores where category = '피자');
 
 -- 문제10: 한식집들의 평균 배달비보다 저렴한 일식집들 (NULL 제외)
 -- 1단계: 한식집들의 평균 배달비 구하기
+select avg(delivery_fee)
+from stores
+where category = '한식';
 -- 2단계: 그보다 저렴한 배달비의 일식집들 찾기 (매장명, 배달비)
+select name, delivery_fee
+from stores
+where category = '일식'
+and delivery_fee < 3200;
 -- 조합 : 1단계 2단계를 조합하여 한 번에 조회하기
+select name, delivery_fee
+from stores
+where category = '일식'
+and delivery_fee < (select avg(delivery_fee)  from stores where category = '한식');
+
+
+
+
+
+
+-- ===============================================================
+-- 2. 다중행 서브쿼리 (MULTi ROW SUBQUERY) N행 1열
+-- IN / NOT IN, > ANY / < ANY, > ALL < ALL, EXISTS / NOT EXISTS사용
+-- 주요연산자 : IN, NOT, IN, ANY, ALL, EXISTS
+-- ===============================================================
+
+-- 1. IN 연산자 - 가장 많이 사용되는 다중행 서브쿼리 
+
+-- 인기 메뉴가 있는 매장들 조회
+-- 1단계 : 인기 메뉴가 있는 매장 ID 들 확인
+SELECT distinct store_id
+FROM menus
+WHERE is_popular = TRUE;
+
+/*
+stores
+id, name, category, addres, phone, rating, delivery_fee
+menus
+id,stord_id,name,description,price,is_popul
+*/
+
+-- 2단계 : 인기있는 매장 id들에 해당하는 매장 정보 찾기
+select  name, category, rating
+from stores
+where id in(SELECT distinct store_id FROM menus WHERE is_popular = TRUE);
+
+
+-- 2. NOT IN 연산자 - 
+-- 3. ANY 연산자 -  
+-- 4. ALL 연산자 -   
+
+
+
+
+
+
 
 
 
