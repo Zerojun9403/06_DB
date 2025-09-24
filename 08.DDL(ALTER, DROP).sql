@@ -26,6 +26,29 @@
 -- ON UPDATE 조건 : 레코드 수정 시 기본값으로 컬럼 데이터 모두 수정
 -- ON UPDATE CURRENT_TIMESTAMP : 특정 컬럼의 데이터 수정될 경우 장동으로 시간 업데이트 설정 
 
+-- 번호 deot_no 
+CREATE TABLE department (
+    dept_id VARCHAR(10),
+    dept_title VARCHAR(35),
+    location_id VARCHAR(10)
+);
+
+CREATE TABLE employee (
+    emp_id INT,
+    emp_name VARCHAR(30),
+    emp_no VARCHAR(14),
+    email VARCHAR(30),
+    phone VARCHAR(12),
+    dept_code VARCHAR(10),
+    job_code VARCHAR(10),
+    sal_level VARCHAR(2),
+    salary INT,
+    bonus DECIMAL(2,1),
+    manager_id INT,
+    hire_date DATE,
+    ent_date DATE,
+    ent_yn CHAR(1) DEFAULT 'N'
+);
 
 
 
@@ -118,29 +141,6 @@ ALTER TABLE employee ADD foreign key(dept_code) references department(dept_id);
 -- 테이블 자체에서 컬럼에 제약조건을 추가하는 것이기 때문에 CONSTRAINT 테이블 레벨로 기본키를 추가하는 것
 -- MYSQL 에서는 컬럼 레벨에서 CHECK 이외에서 모두 제약 조건 명칭을 사용 할수 없음!
 
--- 번호 deot_no 
-CREATE TABLE department (
-    dept_id VARCHAR(10),
-    dept_title VARCHAR(35),
-    location_id VARCHAR(10)
-);
-
-CREATE TABLE employee (
-    emp_id INT,
-    emp_name VARCHAR(30),
-    emp_no VARCHAR(14),
-    email VARCHAR(30),
-    phone VARCHAR(12),
-    dept_code VARCHAR(10),
-    job_code VARCHAR(10),
-    sal_level VARCHAR(2),
-    salary INT,
-    bonus DECIMAL(2,1),
-    manager_id INT,
-    hire_date DATE,
-    ent_date DATE,
-    ent_yn CHAR(1) DEFAULT 'N'
-);
 
 -- employee 테이블에 NOT NULL 제약조건을 emp_name에 추가
 ALTER TABLE employee
@@ -148,7 +148,6 @@ MODIFY emp_name VARCHAR(30) NOT NULL;
 -- ADD 로는 NOT NULL 의 제약 조건을 추가할 수없다. 
 -- ADD 로 제약 조건을 추가할 때 사용 가능한 제약 조건: PK,FK,UNIQUE,CHECK 자료형(INT, VARCHAR, ...) , 새로운 컬럼이름 추ㄱ등
 -- NOT NULL 은 제약조건이 아니라 컬럼의 속서으로 취급되며, 컬럼 속성 변경을 할떄는 MODIFY를 사용해야 함
-
 
 -- employee 테이블에 NOT NULL 제약조건을 emp_no에 추가
 ALTER TABLE employee
@@ -158,11 +157,20 @@ MODIFY emp_no VARCHAR(14) NOT NULL;
 -- 세로운 컬럼을 추가할때는 ADD COLUMN 이라는 예약어를 사용
 ALTER TABLE department
 ADD COLUMN mgr_id INT;
-
 -- ERROR : 1054  MODIFY 의 경우 이미 존재하는 컬럼에서만 가능
--- department 테이블에 create_date 컬럼을 TIMESTAMP 타입으로 기본값 CURRENT_TIMESTAMP로 추가
 
+-- department 테이블에 create_date 컬럼을 TIMESTAMP 타입으로 기본값 CURRENT_TIMESTAMP로 추가
 ALTER TABLE department
 ADD create_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
 
-SELECT * FROM department;
+-- department 테이블에 create_date 컬럼 삭제
+-- INSERT UPDATE DELET : 컬럼 내부에 존재하는 데이터만 가능 
+
+-- 데이터 이상의작업을 진행할 때는 create_date DROP 에서 진행
+ALTER TABLE department DROP COLUMN create_date;
+-- ERROR : 1091의 경우 삭제해야하는 컬럼이 존재하지 않을 때 발생
+
+-- 특정 컬럼의 명칭 변경 RENAME TO
+ALTER TABLE department RENAME COLUMN dept_title TO dept_name;
+
+select * from department;
