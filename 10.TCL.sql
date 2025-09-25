@@ -47,35 +47,37 @@ ROKKBACKL TO SAVAPOINT 포인트이름2; -- 포인트2 지점까지 데이털 �
 */
 -- ==============================
 
+DROP TABLE if exists bookings;
+DROP TABLE if exists events; -- 만드는것은 events 먼저 였으나 외래키로 인하여 bookings 먼저 삭제해주기
+DROP TABLE if exists attendees;
 
 
 
 
-
-CREATE TABLE events (
-    event_id INT PRIMARY KEY AUTO_INCREMENT,
-    event_name VARCHAR(100) NOT NULL,
+ CREATE TABLE events (
+     event_id INT PRIMARY KEY AUTO_INCREMENT,
+     event_name VARCHAR(100) NOT NULL,
     total_seats INT NOT NULL,
     available_seats INT NOT NULL 
-);
+ );
 
-CREATE TABLE attendees (
-    attendee_id INT PRIMARY KEY AUTO_INCREMENT,
-    attendee_name VARCHAR(50) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL
-);
+ CREATE TABLE attendees (
+     attendee_id INT PRIMARY KEY AUTO_INCREMENT,
+     attendee_name VARCHAR(50) NOT NULL,
+     email VARCHAR(100) UNIQUE NOT NULL
+ );
 
-CREATE TABLE bookings (
+ CREATE TABLE bookings (
     booking_id INT PRIMARY KEY AUTO_INCREMENT,
-    event_id INT NOT NULL,
-    attendee_id INT NOT NULL,
+     event_id INT NOT NULL,
+     attendee_id INT NOT NULL,
     booking_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (event_id) REFERENCES events(event_id),
-    FOREIGN KEY (attendee_id) REFERENCES attendees(attendee_id)
-);
+     FOREIGN KEY (event_id) REFERENCES events(event_id),
+     FOREIGN KEY (attendee_id) REFERENCES attendees(attendee_id)
+ );
 
-INSERT INTO events (event_name, total_seats, available_seats) 
-VALUES ('SQL 마스터 클래스', 100, 2); 
+-- INSERT INTO events (event_name, total_seats, available_seats) 
+-- VALUES ('SQL 마스터 클래스', 100, 2); 
 
 
 START transaction; -- 이제부터 수동저장
@@ -83,36 +85,57 @@ START transaction; -- 이제부터 수동저장
 INSERT INTO attendees
 VALUES (1,'김철수','culsoo@gmail.com');
 
--- SQL 마스터 클래스 이벤트의 남은 좌석 1개 줄이기 
--- 김철수씨가 예약
-update events 
-SET available_seats = available_seats - 1 -- available_seats 예약 가능좌석 1개 축소
+-- -- SQL 마스터 클래스 이벤트의 남은 좌석 1개 줄이기 
+-- -- 김철수씨가 예약
+ update events 
+ SET available_seats = available_seats - 1 -- available_seats 예약 가능좌석 1개 축소
 WHERE event_id = 1;
 
 
--- 주의 : select 에서 데이터가 제대로 보인다하여 commit 이 무조건 완성된 것은 아님 
--- SQL 에서 보이더라도 자동커밋이 아닐 때는 java 에서 데이터 불러오기를 했을때 
--- 저장된 데이터가 불러오지 않을 수 있음
--- 지금 database 자체가 아니라 database에 데이터를 명시하는 schenas 명세 상태임
--- java 는 schenas 가 아니라 data랑 상호소통한다.
+-- -- 주의 : select 에서 데이터가 제대로 보인다하여 commit 이 무조건 완성된 것은 아님 
+-- -- SQL 에서 보이더라도 자동커밋이 아닐 때는 java 에서 데이터 불러오기를 했을때 
+-- -- 저장된 데이터가 불러오지 않을 수 있음
+-- -- 지금 database 자체가 아니라 database에 데이터를 명시하는 schenas 명세 상태임
+-- -- java 는 schenas 가 아니라 data랑 상호소통한다.
 
-INSERT INTO bookings(event_id, attendee_id)
+ INSERT INTO bookings(event_id, attendee_id)
 VALUE(1,1);
 
 commit; -- 철수씨 예약 확정
 
-select * from attendees;
-select * from events;
-select * from bookings;
+-- select * from attendees;
+-- select * from events;
+-- select * from bookings;
 
--- 박영희 씨가 클래스 예약을 시도했지만 좌석이 없어서 실패한 시나리오 
--- ROLLBACK
+-- -- 박영희 씨가 클래스 예약을 시도했지만 좌석이 없어서 실패한 시나리오 
+-- -- ROLLBACK
+-- -- START transaction;  commit 하기 전까지 유효 어디서부터 어디까지 흐름 추적하고 
+-- -- commit 저장 완료되면 추적을 중단하겠다.
+-- -- Ctrl + S 는 저장하기와 동시에 COMMIT 상태로 저장됨
+START transaction; 
+INSERT INTO attendees VALUES (3,'박영희','hee_park@gmail.com');
+SELECT * from attendees;
+rollback;
+
+
+-- 일부만 성공 savepoint 
+
+
 
 START transaction; 
--- commit 하기 전까지 유효 어디서부터 어디까지 흐름 추적하고 
--- commit 저장 완료되면 추적을 중단하겠다.
-INSERT INTO attendees
-VALUES (2,'박영희','hee_park@gmail.com');
-
+INSERT INTO attendees VALUES (4,'이민준','joon@gmail.com');
 SELECT * from attendees;
+-- 예약하고자 하는 클래스는 동일하므로 수정안함 
+update events 
+SET available_seats = available_seats - 1 
+WHERE event_id = 1;
 
+-- 예약자 id만 수정
+INSERT INTO bookings(event_id, attendee_id)
+VALUE(1,3);
+savepoint booking_joon_ok;
+commit;
+
+INSERT INTO attendees VALUES (5,'최지아','jia@gmail.com');
+rollback to savepoint booking_joon_ok;
+SELECT * from attendees;
