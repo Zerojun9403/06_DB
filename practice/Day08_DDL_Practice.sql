@@ -18,7 +18,7 @@ INSERT INTO BOOK VALUES ('B002', '자바 프로그래밍', '이몽룡', 20000, 5
 INSERT INTO BOOK VALUES ('B003', '파이썬 따라하기', '성춘향', 300000, 0,'기타');
 
 -- 4. 컬럼 추가 (DEFAULT 문자열은 따옴표 필요)
-ALTER TABLE BOOK ADD CATEGORY VARCHAR(30) DEFAULT '기타';
+ALTER TABLE BOOK ADD CATEGORY VARCH0AR(30) DEFAULT '기타';
 
 -- 5. 데이터 수정
 UPDATE BOOK
@@ -36,9 +36,14 @@ CREATE TABLE CUSTOMER(
 -- 7. ORDER_DETAIL 테이블 생성 (복합키, 외래키 2개)
 CREATE TABLE ORDER_DETAIL(
     ORDER_ID VARCHAR(20),
-    CUSTOMER_ID VARCHAR(10),
-    BOOK_ID VARCHAR(10),
-    QUANTITY INT,
+    CUSTOMER_ID VARCHAR(10),-- 외래키 설정하지 않으면, 참조하지 않으면 참조하는 부모테이블 데이터느 사라지고 자식 테이블 데이터만 남는다
+    BOOK_ID VARCHAR(10),-- 외래키 설정하지 않으면, 참조하지는 부모테이블의 데이터는 사라지고 자식테 테이블 데이터만 남는다
+    QUANTITY INT, 
+    -- 예를 들어, 고객은 탈퇴해서 사라졌는데, 주문에는 고객 데이터 존재
+    -- 1. 주문 받고, 문제없는지 확인하고 고객은 탈퇴를 하거나, 주문내역에만 남기거나
+    -- 2. 고객에게 주문한 모든 데이터를 삭제할 것이고, 이에 대해서 상품을 받지 못하거나 문제생겼을때 
+    -- 이의 제기를 하지 않는다는 서명 후 탈퇴 -> 모든 내역삭제
+    -- 외래키를 설정할 때는 제약조건 제약조건이름 외래키(현재테이블에서 컬럼명) 참조 참조할 테이블(참조할테이블 컬럼명(
     
     PRIMARY KEY (ORDER_ID, BOOK_ID),
     CONSTRAINT FK_ORDER_CUSTOMER FOREIGN KEY (CUSTOMER_ID) REFERENCES CUSTOMER(CUSTOMER_ID),
@@ -101,3 +106,4 @@ SELECT * FROM ORDER_DETAIL;
 
 -- 15. 제약조건 위반 (존재하지 않는 고객/도서 참조 → FK 에러)
 INSERT INTO ORDER_DETAIL VALUES ('O003', 'C999', 'B001', 1);
+-- 1452 : 참조되는 데이터가 존재하지 않아서 발생하는 문제
